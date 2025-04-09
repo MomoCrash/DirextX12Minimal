@@ -1,6 +1,7 @@
 cbuffer cbPerObject : register(b0)
 {
     float4x4 gWorld;
+    float4 color;
 };
 
 cbuffer cbPass : register(b1)

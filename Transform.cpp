@@ -184,7 +184,7 @@ void XM_CALLCONV TRANSFORM::SetLocalRotation(DirectX::FXMVECTOR pRotation)
 
 void TRANSFORM::SetRotation(DirectX::FXMVECTOR pRotation)
 {
-    DirectX::XMStoreFloat4x4(&mRotation, DirectX::XMMatrixRotationRollPitchYawFromVector(pRotation) + XMLoadFloat4x4(&mLocalRotation));
+    DirectX::XMStoreFloat4x4(&mRotation, DirectX::XMMatrixRotationRollPitchYawFromVector(pRotation));
 
     right.x = mRotation._11;
     right.y = mRotation._12;

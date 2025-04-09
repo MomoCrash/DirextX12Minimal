@@ -38,6 +38,8 @@ class d3dUtils
 public:
     static UINT CalcConstantBufferByteSize(UINT byteSize);
 
+    static bool IsKeyDown(int vkeyCode);
+
     static ID3D12Resource* CreateBuffer(
         ID3D12Device* device,
         ID3D12GraphicsCommandList* commandList,

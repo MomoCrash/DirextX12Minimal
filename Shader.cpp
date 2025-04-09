@@ -3,18 +3,18 @@
 
 Shader::Shader(ID3D12Device* device, DXGI_FORMAT rtvFormat, DXGI_FORMAT dsvFormat)
 {
+    
     std::vector<CD3DX12_ROOT_PARAMETER> slotRootParameter(2);
-
+    
     slotRootParameter[0].InitAsConstantBufferView(0);
     slotRootParameter[1].InitAsConstantBufferView(1);
     
     // A root signature is an array of root parameters.
-    CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2,
-                                            slotRootParameter.data(),
+    CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, slotRootParameter.data(),
                                             0,
                                             nullptr, 
                                             D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
-
+    
     // create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
     ID3DBlob* serializedRootSig = nullptr;
     ID3DBlob* errorBlob = nullptr;
@@ -40,15 +40,15 @@ Shader::Shader(ID3D12Device* device, DXGI_FORMAT rtvFormat, DXGI_FORMAT dsvForma
     D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
     ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
     psoDesc.pRootSignature = mRootSignature;
-    psoDesc.InputLayout = { inputLayout.data(), (UINT)inputLayout.size() };
+    psoDesc.InputLayout = { inputLayout.data(), static_cast<UINT>(inputLayout.size()) };
     psoDesc.VS = 
     {
-        reinterpret_cast<BYTE*>(vs->GetBufferPointer()), 
+        static_cast<BYTE*>(vs->GetBufferPointer()), 
         vs->GetBufferSize() 
     };
     psoDesc.PS = 
     { 
-        reinterpret_cast<BYTE*>(ps->GetBufferPointer()), 
+        static_cast<BYTE*>(ps->GetBufferPointer()), 
         ps->GetBufferSize() 
     };
     psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
@@ -62,7 +62,6 @@ Shader::Shader(ID3D12Device* device, DXGI_FORMAT rtvFormat, DXGI_FORMAT dsvForma
     psoDesc.RTVFormats[0] = rtvFormat;
     psoDesc.DSVFormat = dsvFormat;
     device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPSO));
-    
 }
 
 ID3DBlob* Shader::CompileShader(const std::wstring& filename,

@@ -1,6 +1,7 @@
 cbuffer cbPerObject : register(b0)
 {
     float4x4 gWorld;
+    float4 color;
 };
 
 cbuffer cbPass : register(b1)
@@ -17,6 +18,6 @@ struct VS_VertexOut
 
 float4 PS(VS_VertexOut pin) : SV_Target
 {
-    
-    return float4(1.0f, 1.0f, 1.0f, 1.0f);
+    float4 raytracing = float4(0.5f, 0.5f, 0.5f, 1.0f);
+    return color * raytracing;
 }

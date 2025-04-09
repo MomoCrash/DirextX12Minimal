@@ -5,6 +5,11 @@ UINT d3dUtils::CalcConstantBufferByteSize(UINT byteSize)
     return (byteSize + 255) & ~255;
 }
 
+bool d3dUtils::IsKeyDown(int vkeyCode)
+{
+    return (GetAsyncKeyState(vkeyCode) & 0x8000) != 0;
+}
+
 ID3D12Resource* d3dUtils::CreateBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, const void* initData, UINT64 byteSize, ID3D12Resource* uploadBuffer)
 {
     

@@ -9,6 +9,7 @@ class Geometrie;
 
 struct ObjectData {
     DirectX::XMFLOAT4X4 world;
+    DirectX::XMFLOAT4 color;
 };
 
 struct GlobalInformation

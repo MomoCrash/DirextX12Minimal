@@ -6,9 +6,9 @@ struct Vertex
 {
     Vertex(){}
     Vertex(
-        const DirectX::XMFLOAT3& p, 
-        const DirectX::XMFLOAT3& n, 
-        const DirectX::XMFLOAT3& t, 
+        const DirectX::XMFLOAT3& p,
+        const DirectX::XMFLOAT3& n,
+        const DirectX::XMFLOAT3& t,
         const DirectX::XMFLOAT2& uv) :
         Position(p), 
         Normal(n), 

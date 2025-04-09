@@ -33,18 +33,17 @@ void RenderWindow::Update()
     transform.SetPosition({ 2.0f, 2.0f, -5.0f });
     transform.Rotate( 20.0f, -10.0f, 0.0f );
     transform.UpdateMatrix();
+    
     // J'ai rajouter une matrice pour la position de la cam
     XMStoreFloat4x4(&mView, XMMatrixInverse(nullptr, transform.GetMatrix()));
     
     XMMATRIX view = XMLoadFloat4x4(&mView);
     XMMATRIX proj = XMLoadFloat4x4(&mProj);
-
+    
     XMMATRIX viewProj = XMMatrixMultiply(view, proj);
-
-
+    
     GlobalInformation info;
     XMStoreFloat4x4(&info.ViewProj, XMMatrixTranspose(viewProj));
-
     mGlobalConstantBuffer->CopyData(0, info);
 
 }
@@ -81,7 +80,6 @@ void RenderWindow::CloseCommandList()
 
 void RenderWindow::BeginDraw()
 {
-
     OpenCommandList();
 	
     mCommandList->RSSetViewports(1, &mScreenViewport);
@@ -94,8 +92,6 @@ void RenderWindow::BeginDraw()
     mCommandList->ClearDepthStencilView(depthStencilView, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
     mCommandList->OMSetRenderTargets(1, &currentBackBufferView, true, &depthStencilView);
-
-
 }
 
 void RenderWindow::Draw(Shader& shader, Geometrie& geo, UploadBuffer<ObjectData>* buffer)
@@ -107,7 +103,6 @@ void RenderWindow::Draw(Shader& shader, Geometrie& geo, UploadBuffer<ObjectData>
     mCommandList->SetGraphicsRootConstantBufferView(0, buffer->Resource()->GetGPUVirtualAddress());
     mCommandList->SetGraphicsRootConstantBufferView(1, mGlobalConstantBuffer->Resource()->GetGPUVirtualAddress());
 
-
     D3D12_VERTEX_BUFFER_VIEW vertexBuffer = geo.VertexBufferView();
     D3D12_INDEX_BUFFER_VIEW indexBuffer = geo.IndexBufferView();
 
@@ -116,7 +111,6 @@ void RenderWindow::Draw(Shader& shader, Geometrie& geo, UploadBuffer<ObjectData>
     mCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     
     mCommandList->DrawIndexedInstanced(geo.IndicesCount, 1, 0, 0, 0);
-    
 }
 
 void RenderWindow::EndDraw()
