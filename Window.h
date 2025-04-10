@@ -60,12 +60,12 @@ protected:
     float mSecondsPerCount;
     
     HINSTANCE mwInstance;
-    HWND mWindow = nullptr; // main window handle
-    bool      mAppPaused = false;  // is the application paused?
-    bool      mMinimized = false;  // is the application minimized?
-    bool      mMaximized = false;  // is the application maximized?
-    bool      mResizing = false;   // are the resize bars being dragged?
-    bool      mFullscreenState = false;// fullscreen enabled
+    HWND    mWindow             = nullptr;  // main window handle
+    bool    mAppPaused          = false;    // is the application paused?
+    bool    mMinimized          = false;    // is the application minimized?
+    bool    mMaximized          = false;    // is the application maximized?
+    bool    mResizing           = false;    // are the resize bars being dragged?
+    bool    mFullscreenState    = false;    // fullscreen enabled
     
     ID3D12Device* mDevice;
     IDXGISwapChain* mSwapChain;

@@ -1,260 +1,240 @@
 ﻿#include "Transform.h"
 
-using namespace DirectX;
-TRANSFORM::TRANSFORM() : mDirty(false)
-{
-    Identity();
-}
-
-void TRANSFORM::Identity()
-{
-    mMatrix._11 = 1.0f;
-    mMatrix._12 = 0.0f;
-    mMatrix._13 = 0.0f;
-    mMatrix._14 = 0.0f;
-    mMatrix._21 = 0.0f;
-    mMatrix._22 = 1.0f;
-    mMatrix._23 = 0.0f;
-    mMatrix._24 = 0.0f;
-    mMatrix._31 = 0.0f;
-    mMatrix._32 = 0.0f;
-    mMatrix._33 = 1.0f;
-    mMatrix._34 = 0.0f;
-    mMatrix._41 = 0.0f;
-    mMatrix._42 = 0.0f;
-    mMatrix._43 = 0.0f;
-    mMatrix._44 = 1.0f;
-    
-    mRotation._11 = 1.0f;
-    mRotation._12 = 0.0f;
-    mRotation._13 = 0.0f;
-    mRotation._14 = 0.0f;
-    mRotation._21 = 0.0f;
-    mRotation._22 = 1.0f;
-    mRotation._23 = 0.0f;
-    mRotation._24 = 0.0f;
-    mRotation._31 = 0.0f;
-    mRotation._32 = 0.0f;
-    mRotation._33 = 1.0f;
-    mRotation._34 = 0.0f;
-    mRotation._41 = 0.0f;
-    mRotation._42 = 0.0f;
-    mRotation._43 = 0.0f;
-    mRotation._44 = 1.0f;
-    
-    mLocalRotation._11 = 1.0f;
-    mLocalRotation._12 = 0.0f;
-    mLocalRotation._13 = 0.0f;
-    mLocalRotation._14 = 0.0f;
-    mLocalRotation._21 = 0.0f;
-    mLocalRotation._22 = 1.0f;
-    mLocalRotation._23 = 0.0f;
-    mLocalRotation._24 = 0.0f;
-    mLocalRotation._31 = 0.0f;
-    mLocalRotation._32 = 0.0f;
-    mLocalRotation._33 = 1.0f;
-    mLocalRotation._34 = 0.0f;
-    mLocalRotation._41 = 0.0f;
-    mLocalRotation._42 = 0.0f;
-    mLocalRotation._43 = 0.0f;
-    mLocalRotation._44 = 1.0f;
-
-    scale.x = 1.0f;
-    scale.y = 1.0f;
-    scale.z = 1.0f;
-
-    position.x = 0.0f;
-    position.y = 0.0f;
-    position.z = 0.0f;
-
-    localPosition.x = 0.0f;
-    localPosition.y = 0.0f;
-    localPosition.z = 0.0f;
-
-    rotation.x = 0.0f;
-    rotation.y = 0.0f;
-    rotation.z = 0.0f;
-    rotation.w = 1.0f;
-
-    localRotation.x = 0.0f;
-    localRotation.y = 0.0f;
-    localRotation.z = 0.0f;
-    localRotation.w = 1.0f;
-
-    forward.x = 0.0f;
-    forward.y = 0.0f;
-    forward.z = 1.0f;
-    
-    up.x = 0.0f;
-    up.y = 1.0f;
-    up.z = 0.0f;
-
-    right.x = 1.0f;
-    right.y = 0.0f;
-    right.z = 0.0f;
-}
-
-void XM_CALLCONV TRANSFORM::FromMatrix(DirectX::FXMMATRIX pMat)
-{
-    XMStoreFloat4x4(&mMatrix, pMat);
-}
-
-void XM_CALLCONV TRANSFORM::RotationFromQuaternion(DirectX::FXMVECTOR quater)
-{
-    XMStoreFloat4x4(&mRotation, DirectX::XMMatrixRotationQuaternion(quater));
-    mDirty = true;
-}
-
 void TRANSFORM::UpdateMatrix()
 {
-
-    if (mDirty == false) return;
-    mDirty = false;
-    
-    XMMATRIX scalingMatrix = DirectX::XMMatrixScalingFromVector(DirectX::XMLoadFloat3(&scale));
-    XMMATRIX translationMatrix = DirectX::XMMatrixTranslationFromVector(XMLoadFloat3(&position));
-    XMMATRIX rotation = DirectX::XMLoadFloat4x4(&mRotation);
-
-    XMMATRIX matrix = XMMatrixIdentity();
-    matrix = XMMatrixMultiply(matrix, scalingMatrix);
-    matrix = XMMatrixMultiply(matrix, rotation);
-    matrix = XMMatrixMultiply(matrix, translationMatrix);
-    
-    XMStoreFloat4x4(&mMatrix, matrix);
+	XMStoreFloat4x4(
+		&mmMatrix,
+		XMMatrixAffineTransformation(
+			GetScaling(),
+			XMLoadFloat3(&mvOrigin),
+			GetRotation(),
+			GetPosition()
+		)
+	);
+	mIsUpdated = true;
 }
 
-DirectX::XMMATRIX TRANSFORM::GetMatrix()
+TRANSFORM::TRANSFORM()
 {
-    return XMLoadFloat4x4(&mMatrix);
+	Reset();
 }
 
-void XM_CALLCONV TRANSFORM::SetLocalPosition(DirectX::FXMVECTOR pVec)
+TRANSFORM::TRANSFORM(const XMFLOAT3& _position, const XMFLOAT3& _rotationYawPitchRoll, const XMFLOAT3& _scaling)
 {
-    XMStoreFloat3(&localPosition, pVec);
-    XMStoreFloat3(&position, pVec + XMLoadFloat3(&localPosition));
-    mDirty = true;
+
 }
 
-void TRANSFORM::SetPosition(float x, float y, float z)
+
+const XMFLOAT3& TRANSFORM::GetPositionFLOAT() const
 {
-    XMVECTOR vector = XMVectorSet(x, y, z, 1.0f);
-    XMStoreFloat3(&position, vector );
-    mDirty = true;
+    return mvPosition;
 }
 
-void XM_CALLCONV TRANSFORM::SetPosition(DirectX::FXMVECTOR pVec)
+XMVECTOR TRANSFORM::GetPosition()
 {
-    XMStoreFloat3(&position, pVec);
-    mDirty = true;
+    return XMLoadFloat3(&mvPosition);
 }
 
-void XM_CALLCONV TRANSFORM::SetLocalScale(DirectX::FXMVECTOR pLocalScale)
+void TRANSFORM::SetPosition(const XMFLOAT3& _vec)
 {
-    XMStoreFloat3(&localScale, pLocalScale);
-    mDirty = true;
+	mvPosition = _vec;
+	mIsUpdated = false;
 }
 
-void XM_CALLCONV TRANSFORM::SetScale(DirectX::FXMVECTOR pScale)
+void XM_CALLCONV TRANSFORM::SetPosition(FXMVECTOR _vec)
 {
-    XMStoreFloat3(&scale, pScale);
-    mDirty = true;
+	XMStoreFloat3(
+		&mvPosition,
+		_vec
+	);
+	mIsUpdated = false;
 }
 
-void XM_CALLCONV TRANSFORM::SetLocalRotation(DirectX::FXMVECTOR pRotation)
+void TRANSFORM::OffsetPosition(const XMFLOAT3& _vec)
 {
-    XMMATRIX matrix = DirectX::XMMatrixRotationRollPitchYawFromVector(pRotation);
-    XMStoreFloat4x4(&mLocalRotation, matrix);
-    XMMATRIX globalRotation = matrix + XMLoadFloat4x4(&mLocalRotation);
-    XMStoreFloat4x4(&mRotation, globalRotation);
-
-    right.x = mRotation._11;
-    right.y = mRotation._12;
-    right.z = mRotation._13;
-
-    up.x = mRotation._21;
-    up.y = mRotation._22;
-    up.z = mRotation._23;
-    
-    forward.x = mRotation._31;
-    forward.y = mRotation._32;
-    forward.z = mRotation._33;
-    
-    mDirty = true;
+	XMFLOAT3 pos = GetPositionFLOAT();
+	pos.x += _vec.x;
+	pos.y += _vec.y;
+	pos.z += _vec.z;
+	SetPosition(pos);
 }
 
-void TRANSFORM::SetRotation(DirectX::FXMVECTOR pRotation)
+void XM_CALLCONV TRANSFORM::OffsetPosition(FXMVECTOR _vec)
 {
-    DirectX::XMStoreFloat4x4(&mRotation, DirectX::XMMatrixRotationRollPitchYawFromVector(pRotation) + XMLoadFloat4x4(&mLocalRotation));
-
-    right.x = mRotation._11;
-    right.y = mRotation._12;
-    right.z = mRotation._13;
-
-    up.x = mRotation._21;
-    up.y = mRotation._22;
-    up.z = mRotation._23;
-    
-    forward.x = mRotation._31;
-    forward.y = mRotation._32;
-    forward.z = mRotation._33;
-    
-    mDirty = true;
+	SetPosition(GetPosition() + _vec);
 }
 
-void TRANSFORM::Rotate(float pitch, float yaw, float roll)
+const XMFLOAT4& TRANSFORM::GetRotationFLOAT() const
 {
-    mDirty = true;
-    
-    pitch *= DirectX::XM_PI/180;
-    yaw *= DirectX::XM_PI/180;
-    roll *= DirectX::XM_PI/180;
-    DirectX::XMVECTOR currentRotation = DirectX::XMQuaternionIdentity();
-    DirectX::XMVECTOR qTemp;
-    
-    // Pitch
-    qTemp = DirectX::XMQuaternionRotationAxis(DirectX::XMLoadFloat3(&right), pitch);
-    currentRotation = DirectX::XMQuaternionMultiply(currentRotation, qTemp);
-
-    // Yaw
-    qTemp = DirectX::XMQuaternionRotationAxis(DirectX::XMLoadFloat3(&up), yaw);
-    currentRotation = DirectX::XMQuaternionMultiply(currentRotation, qTemp);
-    
-    // Roll
-    qTemp = DirectX::XMQuaternionRotationAxis(DirectX::XMLoadFloat3(&forward), roll);
-    currentRotation = DirectX::XMQuaternionMultiply(currentRotation, qTemp);
-
-    // Multiply quaternion with rotation 
-    DirectX::XMVECTOR objectRotation = DirectX::XMLoadFloat4(&rotation);
-    objectRotation = DirectX::XMQuaternionMultiply(objectRotation, currentRotation);
-    DirectX::XMStoreFloat4(&rotation, objectRotation);
-
-    // Rotate matrix
-    DirectX::XMStoreFloat4x4(&mRotation, DirectX::XMMatrixRotationQuaternion(objectRotation));
-
-    right.x = mRotation._11;
-    right.y = mRotation._12;
-    right.z = mRotation._13;
-
-    up.x = mRotation._21;
-    up.y = mRotation._22;
-    up.z = mRotation._23;
-    
-    forward.x = mRotation._31;
-    forward.y = mRotation._32;
-    forward.z = mRotation._33;
+	return mqRotation;
 }
 
-void TRANSFORM::RotateYaw(float angle)
+XMVECTOR TRANSFORM::GetRotation()
 {
-    Rotate(0.0f, angle, 0.0f);
+	return XMLoadFloat4(&mqRotation);
 }
 
-void TRANSFORM::RotatePitch(float angle)
+void TRANSFORM::SetRotationQuaternion(const XMFLOAT4& _vec)
 {
-    Rotate(angle, 0.0f, 0.0f);
+	mqRotation = _vec;
+	XMVECTOR qRot = XMLoadFloat4(
+		&mqRotation
+	);
+	XMStoreFloat4x4(
+		&mmRotation,
+		XMMatrixRotationQuaternion(
+			qRot
+		)
+	);
+
+	mvRight		= { mmRotation._11, mmRotation._12, mmRotation._13 };
+	mvUp		= { mmRotation._21, mmRotation._22, mmRotation._23 };
+	mvForward	= { mmRotation._31, mmRotation._32, mmRotation._33 };
+	mIsUpdated = false;
 }
 
-void TRANSFORM::RotateRoll(float angle)
+void XM_CALLCONV TRANSFORM::SetRotationQuaternion(FXMVECTOR _vec)
 {
-    Rotate(0.0f, 0.0f, angle);
+	XMStoreFloat4(
+		&mqRotation,
+		_vec
+	);
+	XMStoreFloat4x4(
+		&mmRotation,
+		XMMatrixRotationQuaternion(_vec)
+	);
+	mvRight = { mmRotation._11, mmRotation._12, mmRotation._13 };
+	mvUp = { mmRotation._21, mmRotation._22, mmRotation._23 };
+	mvForward = { mmRotation._31, mmRotation._32, mmRotation._33 };
+	mIsUpdated = false;
+}
+
+void TRANSFORM::SetRotationYPR(const XMFLOAT3& _ypr)
+{
+	XMVECTOR RIGHT		= { 1, 0, 0, 0 };
+	XMVECTOR UP			= { 0, 1, 0, 0 };
+	XMVECTOR FORWARD	= { 0, 0, 1, 0 };
+
+	XMVECTOR qRot = XMQuaternionRotationAxis(UP, _ypr.x);
+	XMVECTOR qRotTemp;
+
+	RIGHT = XMVector3Rotate(RIGHT, qRot);
+	qRotTemp = XMQuaternionRotationAxis(RIGHT, _ypr.y);
+	qRot = XMQuaternionMultiply(qRot, qRotTemp);
+
+	FORWARD = XMVector3Rotate(FORWARD, qRot);
+	qRotTemp = XMQuaternionRotationAxis(FORWARD, _ypr.z);
+	qRot = XMQuaternionMultiply(qRot, qRotTemp);
+
+	SetRotationQuaternion(qRot);
+}
+
+void XM_CALLCONV TRANSFORM::SetRotationYPR(FXMVECTOR _ypr)
+{
+	XMFLOAT3 YPR;
+	XMStoreFloat3(
+		&YPR,
+		_ypr
+	);
+	SetRotationYPR(YPR);
+}
+
+const XMFLOAT3& TRANSFORM::GetScalingFLOAT() const
+{
+	return mvScaling;
+}
+
+XMVECTOR TRANSFORM::GetScaling()
+{
+	return XMLoadFloat3(&mvScaling);
+}
+
+void TRANSFORM::SetScaling(const XMFLOAT3& _vec)
+{
+	mvScaling = _vec;
+	mIsUpdated = false;
+}
+
+void XM_CALLCONV TRANSFORM::SetScaling(FXMVECTOR _vec)
+{
+	XMStoreFloat3(
+		&mvScaling,
+		_vec
+	);
+	mIsUpdated = false;
+}
+
+const XMFLOAT4X4& TRANSFORM::GetMatrixFLOAT()
+{
+	if (mIsUpdated == false)
+		UpdateMatrix();
+	return mmMatrix;
+}
+
+XMMATRIX TRANSFORM::GetMatrix()
+{
+	if (mIsUpdated == false)
+		UpdateMatrix();
+	return XMLoadFloat4x4(&mmMatrix);
+}
+
+XMFLOAT3 TRANSFORM::Forward()
+{
+	return mvForward;
+}
+
+XMFLOAT3 TRANSFORM::Right()
+{
+	return mvRight;
+}
+
+XMFLOAT3 TRANSFORM::Up()
+{
+	return mvUp;
+}
+
+XMMATRIX TRANSFORM::operator*(TRANSFORM& _other)
+{
+	XMMATRIX mat = GetMatrix();
+	mat *= _other.GetMatrix();
+	return mat;
+}
+
+XMMATRIX XM_CALLCONV TRANSFORM::operator*(FXMMATRIX _other)
+{
+	XMMATRIX mat = GetMatrix();
+	mat *= _other;
+	return mat;
+}
+
+XMVECTOR TRANSFORM::operator*(const XMFLOAT3& _other)
+{
+	return XMVector3Transform(XMLoadFloat3(&_other), GetMatrix());
+}
+
+void TRANSFORM::Reset()
+{
+	mvPosition = { 0, 0, 0 };
+	mvScaling = { 1, 1, 1 };
+
+	mvRight = { 1, 0, 0 };
+	mvUp = { 0, 1, 0 };
+	mvForward = { 0, 0, 1 };
+	mvOrigin = { 0, 0, 0 };
+
+	XMStoreFloat4(
+		&mqRotation,
+		XMQuaternionIdentity()
+	);
+
+	XMStoreFloat4x4(
+		&mmRotation,
+		XMMatrixIdentity()
+	);
+
+	XMStoreFloat4x4(
+		&mmMatrix,
+		XMMatrixIdentity()
+	);
+	mIsUpdated = true;
 }

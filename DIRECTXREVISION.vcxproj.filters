@@ -66,4 +66,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="Shaders\PS.hlsl">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Shaders\VS.hlsl">
+      <Filter>Resource Files</Filter>
+    </Text>
+  </ItemGroup>
 </Project>
