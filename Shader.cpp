@@ -29,10 +29,16 @@ Shader::Shader(ID3D12Device* device, DXGI_FORMAT rtvFormat, DXGI_FORMAT dsvForma
     );
 
     std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout;
-    inputLayout.push_back({ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
-    inputLayout.push_back({ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
-    inputLayout.push_back({ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
-    inputLayout.push_back({ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 36, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
+    inputLayout.push_back({ 
+        "POSITION",                                 // Token 
+        0,                                          // ??? 
+        DXGI_FORMAT_R32G32B32_FLOAT,                // Type 
+        0,                                          // ??? 
+        0,                                          // Décalage mémoire ===||
+        D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, // ???                 \/
+        0                                           // ???
+        });
+    inputLayout.push_back({ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
 
     ID3DBlob* vs = CompileShader(L"Shaders/VS.hlsl", nullptr, "VS", "vs_5_1");
     ID3DBlob* ps = CompileShader(L"Shaders/PS.hlsl", nullptr, "PS", "ps_5_1");
@@ -62,7 +68,6 @@ Shader::Shader(ID3D12Device* device, DXGI_FORMAT rtvFormat, DXGI_FORMAT dsvForma
     psoDesc.RTVFormats[0] = rtvFormat;
     psoDesc.DSVFormat = dsvFormat;
     device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPSO));
-    
 }
 
 ID3DBlob* Shader::CompileShader(const std::wstring& filename,

@@ -4,49 +4,62 @@
 
 const float Pi = 3.1415926535f;
 
+using namespace DirectX;
+
 struct TRANSFORM
 {
-private:
-    bool mDirty;
-    DirectX::XMFLOAT4X4 mMatrix;
-    DirectX::XMFLOAT4X4 mRotation;
-    DirectX::XMFLOAT4X4 mLocalRotation;
-    
+	XMFLOAT3 mvPosition;
+	XMFLOAT3 mvScaling;
+
+	XMFLOAT3 mvRight;
+	XMFLOAT3 mvUp;
+	XMFLOAT3 mvForward;
+	XMFLOAT3 mvOrigin;
+
+	XMFLOAT4 mqRotation;
+	XMFLOAT4X4 mmRotation;
+
+	XMFLOAT4X4 mmMatrix;
+	bool mIsUpdated = true;
+
+	void UpdateMatrix();
 public:
-    TRANSFORM();
-    DirectX::XMFLOAT3 forward;
-    DirectX::XMFLOAT3 right;
-    DirectX::XMFLOAT3 up;
+	TRANSFORM();
+	TRANSFORM(
+		const XMFLOAT3& _position,
+		const XMFLOAT3& _rotationYawPitchRoll,
+		const XMFLOAT3& _scaling
+	);
 
-    DirectX::XMFLOAT4 rotation;
-    DirectX::XMFLOAT4 localRotation;
-    
-    DirectX::XMFLOAT3 scale;
-    DirectX::XMFLOAT3 localScale;
+	const XMFLOAT3& GetPositionFLOAT() const;
+	XMVECTOR GetPosition();
+	void SetPosition(const XMFLOAT3& _vec);
+	void XM_CALLCONV SetPosition(FXMVECTOR _vec);
+	void OffsetPosition(const XMFLOAT3& _vec);
+	void XM_CALLCONV OffsetPosition(FXMVECTOR _vec);
 
-    DirectX::XMFLOAT3 position;
-    DirectX::XMFLOAT3 localPosition;
+	const XMFLOAT4& GetRotationFLOAT() const;
+	XMVECTOR GetRotation();
+	void SetRotationQuaternion(const XMFLOAT4& _vec);
+	void XM_CALLCONV SetRotationQuaternion(FXMVECTOR _vec);
+	void SetRotationYPR(const XMFLOAT3& _ypr);
+	void XM_CALLCONV SetRotationYPR(FXMVECTOR _ypr);
 
-    void Identity();
-    void UpdateMatrix();
+	const XMFLOAT3& GetScalingFLOAT() const;
+	XMVECTOR GetScaling();
+	void SetScaling(const XMFLOAT3& _vec);
+	void XM_CALLCONV SetScaling(FXMVECTOR _vec);
 
-    DirectX::XMMATRIX GetMatrix();
-    void XM_CALLCONV FromMatrix(DirectX::FXMMATRIX pMat);
-    void XM_CALLCONV RotationFromQuaternion(DirectX::FXMVECTOR pMat);
-    
-    void SetPosition(float x, float y, float z);
-    
-    void XM_CALLCONV SetLocalPosition(DirectX::FXMVECTOR pLocalVec);
-    void XM_CALLCONV SetPosition(DirectX::FXMVECTOR pVec);
+	const XMFLOAT4X4& GetMatrixFLOAT();
+	XMMATRIX GetMatrix();
 
-    void XM_CALLCONV SetLocalScale(DirectX::FXMVECTOR pLocalScale);
-    void XM_CALLCONV SetScale(DirectX::FXMVECTOR pScale);
+	XMFLOAT3 Forward();
+	XMFLOAT3 Right();
+	XMFLOAT3 Up();
 
-    void XM_CALLCONV SetLocalRotation(DirectX::FXMVECTOR pRotation);
-    void XM_CALLCONV SetRotation(DirectX::FXMVECTOR pRotation);
-    
-    void Rotate(float pitch, float yaw, float roll);
-    void RotatePitch(float angle);
-    void RotateYaw(float angle);
-    void RotateRoll(float angle);
+	XMMATRIX operator * (TRANSFORM& _other);
+	XMMATRIX XM_CALLCONV operator * (FXMMATRIX _other);
+	XMVECTOR operator * (const XMFLOAT3& _other);
+
+	void Reset();
 };

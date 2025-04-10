@@ -195,7 +195,8 @@ bool Window::InitializeDirectX()
     HRESULT hardwareResult = D3D12CreateDevice(
         nullptr,             // default adapter
         D3D_FEATURE_LEVEL_12_0,
-        IID_PPV_ARGS(&mDevice));
+        IID_PPV_ARGS(&mDevice)
+	);
 
     // Fallback to WARP device.
     if(FAILED(hardwareResult))
@@ -206,11 +207,14 @@ bool Window::InitializeDirectX()
         D3D12CreateDevice(
             pWarpAdapter,
             D3D_FEATURE_LEVEL_11_0,
-            IID_PPV_ARGS(&mDevice));
+            IID_PPV_ARGS(&mDevice)
+		);
     }
 
+	// FENCE : Vigile du GPU
     mDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&mFence));
 
+	// CONSTANTES
     mRtvDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     mDsvDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
     mCbvSrvUavDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
