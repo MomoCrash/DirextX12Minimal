@@ -6,45 +6,49 @@ void Geometrie::CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* comm
 {
 	
 	MeshData meshData;
+	
+	float w2 = 0.5f*width;
+	float h2 = 0.5f*height;
+	float d2 = 0.5f*depth;
+    
+	// Fill in the front face vertex data.
+	v[0] = Vertex(-w2, -h2, -d2, 0.0f, 0.0f, 1.0f, 1.0f);
+	v[1] = Vertex(-w2, +h2, -d2, 0.0f, 0.0f, 1.0f, 1.0f);
+	v[2] = Vertex(+w2, +h2, -d2, 0.0f, 0.0f, 1.0f, 1.0f);
+	v[3] = Vertex(+w2, -h2, -d2, 0.0f, 0.0f, 1.0f, 1.0f);
 
-	VERTEX v[24] = {
-		// FRONT
-		{{ -.5f, -.5f, -.5f }, {  0, 0, 0, 1 }},	// 0
-		{{ -.5f,  .5f, -.5f }, {  0, 1, 0, 1 }},	// 1
-		{{  .5f,  .5f, -.5f }, {  1, 1, 0, 1 }},	// 2
-		{{  .5f, -.5f, -.5f }, {  1, 0, 0, 1 }},	// 3
+	// Fill in the back face vertex data.
+	v[4] = Vertex(-w2, -h2, +d2, 0.0f, 0.0f, 1.0f, 1.0f);
+	v[5] = Vertex(+w2, -h2, +d2, 0.0f, 0.0f, 1.0f, 1.0f);
+	v[6] = Vertex(+w2, +h2, +d2, 0.0f, 0.0f, 1.0f, 1.0f);
+	v[7] = Vertex(-w2, +h2, +d2, 0.0f, 0.0f, 1.0f, 1.0f);
 
-		// BACK
-		{{ -.5f, -.5f,  .5f }, {  0, 0, 1, 1 }},	// 4
-		{{  .5f, -.5f,  .5f }, {  1, 0, 1, 1 }},	// 5
-		{{  .5f,  .5f,  .5f }, {  1, 1, 1, 1 }},	// 6
-		{{ -.5f,  .5f,  .5f }, {  0, 1, 1, 1 }},	// 7 
+	// Fill in the top face vertex data.
+	v[8]  = Vertex(-w2, +h2, -d2, 0.0f, 1.0f, 0.0f, 1.0f);
+	v[9]  = Vertex(-w2, +h2, +d2, 0.0f, 1.0f, 0.0f, 1.0f);
+	v[10] = Vertex(+w2, +h2, +d2, 0.0f, 1.0f, 0.0f, 1.0f);
+	v[11] = Vertex(+w2, +h2, -d2, 0.0f, 1.0f, 0.0f, 1.0f);
 
-		// LEFT
-		{{ -.5f, -.5f,  .5f }, { 0, 0, 1, 1 }},	// 8
-		{{ -.5f,  .5f,  .5f }, { 0, 1, 1, 1 }},	// 9
-		{{ -.5f,  .5f, -.5f }, { 0, 1, 0, 1 }},	// 10
-		{{ -.5f, -.5f, -.5f }, { 0, 0, 0, 1 }},	// 11
+	// Fill in the bottom face vertex data.
+	v[12] = Vertex(-w2, -h2, -d2, 0.0f, 1.0f, 0.0f, 1.0f);
+	v[13] = Vertex(+w2, -h2, -d2, 0.0f, 1.0f, 0.0f, 1.0f);
+	v[14] = Vertex(+w2, -h2, +d2, 0.0f, 1.0f, 0.0f, 1.0f);
+	v[15] = Vertex(-w2, -h2, +d2, 0.0f, 1.0f, 0.0f, 1.0f);
 
-		// RIGHT
-		{{  .5f, -.5f, -.5f }, {  1, 0, 0, 1 }},	// 12
-		{{  .5f,  .5f, -.5f }, {  1, 1, 0, 1 }},	// 13
-		{{  .5f,  .5f,  .5f }, {  1, 1, 1, 1 }},	// 14
-		{{  .5f, -.5f,  .5f }, {  1, 0, 1, 1 }},	// 15
+	// Fill in the left face vertex data.
+	v[16] = Vertex(-w2, -h2, +d2, 1.0f, 0.0f, 0.0f, 0.0);
+	v[17] = Vertex(-w2, +h2, +d2, 1.0f, 0.0f, 0.0f, 0.0);
+	v[18] = Vertex(-w2, +h2, -d2, 1.0f, 0.0f, 0.0f, 0.0);
+	v[19] = Vertex(-w2, -h2, -d2, 1.0f, 0.0f, 0.0f, 0.0);
 
-		// TOP
-		{{ -.5f,  .5f, -.5f }, {  0, 1, 0, 1 }},	// 16
-		{{ -.5f,  .5f,  .5f }, {  0, 1, 1, 1 }},	// 17
-		{{  .5f,  .5f,  .5f }, {  1, 1, 1, 1 }},	// 18
-		{{  .5f,  .5f, -.5f }, {  1, 1, 0, 1 }},	// 19
-
-		// BOTTOM
-		{{ -.5f, -.5f,  .5f }, {  0, 0, 1, 1 }},	// 20
-		{{ -.5f, -.5f, -.5f }, {  0, 0, 0, 1 }},	// 21
-		{{  .5f, -.5f, -.5f }, {  1, 0, 0, 1 }},	// 22
-		{{  .5f, -.5f,  .5f }, {  1, 0, 1, 1 }},	// 23
+	// Fill in the right face vertex data.
+	v[20] = Vertex(+w2, -h2, -d2, 1.0f, 0.0f, 0.0f, 0.0f);
+	v[21] = Vertex(+w2, +h2, -d2, 1.0f, 0.0f, 0.0f, 0.0f);
+	v[22] = Vertex(+w2, +h2, +d2, 1.0f, 0.0f, 0.0f, 0.0f);
+	v[23] = Vertex(+w2, -h2, +d2, 1.0f, 0.0f, 0.0f, 0.0f);
 
 	};
+	
 	meshData.Vertices.assign(&v[0], &v[24]);
  
 	//
@@ -76,27 +80,20 @@ void Geometrie::CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* comm
 		20, 22, 23
 	};
 
-	meshData.Indices32.assign(&i[0], &i[36]);
-
+	meshData.Indices16.assign(&i[0], &i[36]);
+	
 	std::vector<VERTEX> vertex = meshData.Vertices;
 	std::vector<uint16> index = meshData.GetIndices16();
 
 	const UINT vbByteSize = (UINT)vertex.size() * sizeof(VERTEX);
 	const UINT ibByteSize = (UINT)index.size() * sizeof(uint16);
 
-	// Emplacement memoire CPU
-	D3DCreateBlob(vbByteSize, &VertexBuffer);
-	CopyMemory(VertexBuffer->GetBufferPointer(), vertex.data(), vbByteSize);
-
-	D3DCreateBlob(ibByteSize, &IndexBuffer);
-	CopyMemory(IndexBuffer->GetBufferPointer(), index.data(), ibByteSize);
-
 	// Copy the triangle data to the vertex buffer.
-	VertexBufferGPU = d3dUtils::CreateBuffer(device, commandList, vertex.data(), vbByteSize, VertexBufferUploader);
+	VertexBufferGPU = d3dUtils::CreateBuffer(device, commandList, vertex.data(), vbByteSize);
 	VertexBufferGPU->SetName(L"VERTEX_BUFFER");
 	
 	// Copy the triangle data to the indices buffer.
-	IndexBufferGPU = d3dUtils::CreateBuffer(device, commandList, index.data(), ibByteSize, IndexBufferUploader);
+	IndexBufferGPU = d3dUtils::CreateBuffer(device, commandList, index.data(), ibByteSize);
 	IndexBufferGPU->SetName(L"INDEX_BUFFER");
 
 	// Initialize the vertex buffer view.
@@ -106,13 +103,7 @@ void Geometrie::CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* comm
 	// Initialize the indices buffer view.
 	IndexFormat = DXGI_FORMAT_R16_UINT;
 	IndexBufferByteSize = ibByteSize;
-
-	IndicesCount = static_cast<UINT>(index.size());
-
-	delete VertexBufferUploader;
-	delete IndexBufferUploader;
 	
-	VertexBufferUploader = nullptr;
-	IndexBufferUploader = nullptr;
+	IndicesCount = index.size();
 	
 }

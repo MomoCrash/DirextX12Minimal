@@ -1,13 +1,21 @@
 ﻿#include "d3dUtils.h"
 
+#include "UploadBuffer.h"
+
 UINT d3dUtils::CalcConstantBufferByteSize(UINT byteSize)
 {
     return (byteSize + 255) & ~255;
 }
 
-ID3D12Resource* d3dUtils::CreateBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, const void* initData, UINT64 byteSize, ID3D12Resource* uploadBuffer)
+bool d3dUtils::IsKeyDown(int vkeyCode)
+{
+    return (GetAsyncKeyState(vkeyCode) & 0x8000) != 0;
+}
+
+ID3D12Resource* d3dUtils::CreateBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, const void* initData, UINT64 byteSize, UploadBuffer())
 {
     
+    ID3D12Resource* uploadBuffer;
     ID3D12Resource* defaultBuffer;
 
     CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
