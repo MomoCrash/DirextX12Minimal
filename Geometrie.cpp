@@ -10,6 +10,8 @@ void Geometrie::CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* comm
 	float w2 = 0.5f*width;
 	float h2 = 0.5f*height;
 	float d2 = 0.5f*depth;
+
+	std::vector<Vertex> v (24);
     
 	// Fill in the front face vertex data.
 	v[0] = Vertex(-w2, -h2, -d2, 0.0f, 0.0f, 1.0f, 1.0f);
@@ -46,8 +48,6 @@ void Geometrie::CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* comm
 	v[21] = Vertex(+w2, +h2, -d2, 1.0f, 0.0f, 0.0f, 0.0f);
 	v[22] = Vertex(+w2, +h2, +d2, 1.0f, 0.0f, 0.0f, 0.0f);
 	v[23] = Vertex(+w2, -h2, +d2, 1.0f, 0.0f, 0.0f, 0.0f);
-
-	};
 	
 	meshData.Vertices.assign(&v[0], &v[24]);
  
@@ -79,31 +79,26 @@ void Geometrie::CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* comm
 		20, 21, 22,
 		20, 22, 23
 	};
-
-	meshData.Indices16.assign(&i[0], &i[36]);
 	
-	std::vector<VERTEX> vertex = meshData.Vertices;
-	std::vector<uint16> index = meshData.GetIndices16();
+	meshData.Indices16.assign(&i[0], &i[36]);
 
-	const UINT vbByteSize = (UINT)vertex.size() * sizeof(VERTEX);
-	const UINT ibByteSize = (UINT)index.size() * sizeof(uint16);
+	const UINT vbByteSize = (UINT)meshData.Vertices.size() * sizeof(Vertex);
+	const UINT ibByteSize = (UINT)meshData.Indices16.size() * sizeof(uint16);
 
 	// Copy the triangle data to the vertex buffer.
-	VertexBufferGPU = d3dUtils::CreateBuffer(device, commandList, vertex.data(), vbByteSize);
+	VertexBufferGPU = d3dUtils::CreateBuffer(device, commandList, meshData.Vertices.data(), vbByteSize);
 	VertexBufferGPU->SetName(L"VERTEX_BUFFER");
 	
 	// Copy the triangle data to the indices buffer.
-	IndexBufferGPU = d3dUtils::CreateBuffer(device, commandList, index.data(), ibByteSize);
+	IndexBufferGPU = d3dUtils::CreateBuffer(device, commandList, meshData.Indices16.data(), ibByteSize);
 	IndexBufferGPU->SetName(L"INDEX_BUFFER");
 
 	// Initialize the vertex buffer view.
-	VertexByteStride = sizeof(VERTEX);
+	VertexByteStride = sizeof(Vertex);
 	VertexBufferByteSize = vbByteSize;
 
 	// Initialize the indices buffer view.
 	IndexFormat = DXGI_FORMAT_R16_UINT;
 	IndexBufferByteSize = ibByteSize;
-	
-	IndicesCount = index.size();
 	
 }
