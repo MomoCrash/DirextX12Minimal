@@ -3,7 +3,6 @@
 #include "d3dUtils.h"
 #include "UploadBuffer.h"
 #include "Window.h"
-#include "Transform.h"
 
 class Shader;
 class Geometrie;
@@ -22,8 +21,6 @@ class RenderWindow : public Window
 {
     
 public:
-    TRANSFORM cam;
-
     RenderWindow(HINSTANCE hInstance);
     bool Initialize() override;
     void Update() override;
