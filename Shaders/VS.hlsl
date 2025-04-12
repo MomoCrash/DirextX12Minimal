@@ -11,15 +11,14 @@ cbuffer cbPass : register(b1)
 struct VS_VertexIn
 {
     float3 PosL : POSITION;
-    float3 Norm : NORMAL;
-    float3 Tangent : TANGENT;
-    float2 UV : TEXCOORD;
+    float4 Color : COLOR;
 };
 
 struct VS_VertexOut
 {
     float4 PosH : SV_POSITION;
     float3 PosW : POSITION;
+    float4 Color : COLOR;
 };
 
 VS_VertexOut VS(VS_VertexIn vin)
@@ -31,6 +30,7 @@ VS_VertexOut VS(VS_VertexIn vin)
     vout.PosH = mul(posW, gViewProj);
     
     vout.PosW = posW.xyz;
+    vout.Color = vin.Color;
 	
     return vout;
 }

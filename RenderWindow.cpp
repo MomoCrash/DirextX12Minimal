@@ -8,14 +8,18 @@ using namespace DirectX ;
 
 RenderWindow::RenderWindow(HINSTANCE hInstance) : Window(hInstance)
 {
+
 }
 
 bool RenderWindow::Initialize()
 {
-    
     Window::Initialize();
 
     OpenCommandList();
+
+    cam.Reset();
+    cam.SetPosition(XMFLOAT3{ 0.0f, 0.0f, -5.0f });
+    cam.SetRotationYPR(XMFLOAT3{ 0.0f, 0.0f, 0.0f });
 
     mGlobalConstantBuffer = new UploadBuffer<GlobalInformation>(mDevice, 1, true);
     mGlobalConstantBuffer->Resource()->SetName(L"PASS_BUFFER");
@@ -27,26 +31,18 @@ bool RenderWindow::Initialize()
 
 void RenderWindow::Update()
 {
-
-    TRANSFORM transform;
-    transform.Identity();
-    transform.SetPosition({ 2.0f, 2.0f, -5.0f });
-    transform.Rotate( 20.0f, -10.0f, 0.0f );
-    transform.UpdateMatrix();
     // J'ai rajouter une matrice pour la position de la cam
-    XMStoreFloat4x4(&mView, XMMatrixInverse(nullptr, transform.GetMatrix()));
+    XMStoreFloat4x4(&mView, XMMatrixInverse(nullptr, cam.GetMatrix()));
     
     XMMATRIX view = XMLoadFloat4x4(&mView);
     XMMATRIX proj = XMLoadFloat4x4(&mProj);
 
     XMMATRIX viewProj = XMMatrixMultiply(view, proj);
 
-
     GlobalInformation info;
     XMStoreFloat4x4(&info.ViewProj, XMMatrixTranspose(viewProj));
 
     mGlobalConstantBuffer->CopyData(0, info);
-
 }
 
 void RenderWindow::OnResize()
@@ -106,7 +102,6 @@ void RenderWindow::Draw(Shader& shader, Geometrie& geo, UploadBuffer<ObjectData>
 
     mCommandList->SetGraphicsRootConstantBufferView(0, buffer->Resource()->GetGPUVirtualAddress());
     mCommandList->SetGraphicsRootConstantBufferView(1, mGlobalConstantBuffer->Resource()->GetGPUVirtualAddress());
-
 
     D3D12_VERTEX_BUFFER_VIEW vertexBuffer = geo.VertexBufferView();
     D3D12_INDEX_BUFFER_VIEW indexBuffer = geo.IndexBufferView();

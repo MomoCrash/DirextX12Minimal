@@ -29,8 +29,6 @@
 #include "d3dx12.h"
 #include <DirectXColors.h>
 
-#include "UploadBuffer.h"
-
 #pragma comment(lib,"d3dcompiler.lib")
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -44,6 +42,7 @@ public:
         ID3D12Device* device,
         ID3D12GraphicsCommandList* commandList,
         const void* initData,
-        UINT64 byteSize, UploadBuffer<>);
+        UINT64 byteSize,
+        ID3D12Resource* uploadBuffer);
     
 };

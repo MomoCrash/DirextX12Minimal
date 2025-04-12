@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "d3dUtils.h"
+#include "Transform.h"
 #include "UploadBuffer.h"
 #include "Window.h"
 
@@ -29,8 +30,7 @@ public:
 
     void OpenCommandList();
     void CloseCommandList();
-
-public:
+    
     void BeginDraw() override;
     void Draw(Shader& shader, Geometrie& geo, UploadBuffer<ObjectData>* objectBuffer);
     void EndDraw() override;
@@ -39,8 +39,9 @@ public:
     void OnMouseUp(WPARAM btnState, int x, int y) override{}
     void OnMouseMove(WPARAM btnState, int x, int y) override{}
     void OnKeyPressed(WPARAM btnState, int x, int y) override{}
-
-public:
+    
+    TRANSFORM cam;
+    
     DirectX::XMFLOAT4X4 mView;
     DirectX::XMFLOAT4X4 mProj;
     UploadBuffer<GlobalInformation>* mGlobalConstantBuffer;

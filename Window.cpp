@@ -209,8 +209,10 @@ bool Window::InitializeDirectX()
             IID_PPV_ARGS(&mDevice));
     }
 
+	// FENCE : Vigile du GPU
     mDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&mFence));
 
+	// CONSTANTES
     mRtvDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     mDsvDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
     mCbvSrvUavDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -497,6 +499,7 @@ LRESULT Window::InputHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			OnResize();
 		}
+		return 0;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
