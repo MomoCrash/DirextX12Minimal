@@ -6,7 +6,14 @@
 
 using namespace DirectX ;
 
-RenderWindow::RenderWindow(HINSTANCE hInstance) : Window(hInstance) { }
+RenderWindow::RenderWindow(HINSTANCE hInstance) : Window(hInstance), mView(), mProj(), mGlobalConstantBuffer(nullptr)
+{
+}
+
+RenderWindow::~RenderWindow() 
+{
+    delete mGlobalConstantBuffer;
+}
 
 bool RenderWindow::Initialize()
 {
@@ -20,8 +27,6 @@ bool RenderWindow::Initialize()
 
     mGlobalConstantBuffer = new UploadBuffer<GlobalInformation>(mDevice, 1, true);
     mGlobalConstantBuffer->Resource()->SetName(L"PASS_BUFFER");
-    
-    mShader = new Shader(GetDevice(), GetBackBufferFormat(), GetDepthStencilFormat());
 
     return 1;
 }
@@ -91,13 +96,13 @@ void RenderWindow::BeginDraw()
 
 }
 
-void RenderWindow::Draw(Shader& shader, Geometrie& geo, UploadBuffer<ObjectData>* buffer)
+void RenderWindow::Draw(Shader const& shader, Geometrie const& geo, UploadBuffer<ObjectData> const& buffer)
 {
 
     mCommandList->SetGraphicsRootSignature(shader.mRootSignature);
     mCommandList->SetPipelineState(shader.mPSO);
 
-    mCommandList->SetGraphicsRootConstantBufferView(0, buffer->Resource()->GetGPUVirtualAddress());
+    mCommandList->SetGraphicsRootConstantBufferView(0, buffer.Resource()->GetGPUVirtualAddress());
     mCommandList->SetGraphicsRootConstantBufferView(1, mGlobalConstantBuffer->Resource()->GetGPUVirtualAddress());
 
     D3D12_VERTEX_BUFFER_VIEW vertexBuffer = geo.VertexBufferView();

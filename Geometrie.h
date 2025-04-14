@@ -25,8 +25,8 @@ class Geometrie
 {
     
 public:
-
-    void CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, float width, float height, float depth);
+    ~Geometrie();
+    void InitializeAsCube(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, float width, float height, float depth);
 
     // Coter CPU
     MeshData meshData;

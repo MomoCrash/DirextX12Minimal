@@ -21,12 +21,12 @@ Shader::Shader(ID3D12Device* device, DXGI_FORMAT rtvFormat, DXGI_FORMAT dsvForma
     D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
         &serializedRootSig, &errorBlob);*/
 
-    ID3DBlob* rootSignature = CompileShader(L"Shaders/Rootsignature.hlsl", nullptr, "ROOTSIG", "rootsig_1_1");
+    mRootSignatureCPU = CompileShader(L"Shaders/Rootsignature.hlsl", nullptr, "ROOTSIG", "rootsig_1_1");
     
     device->CreateRootSignature(
         0,
-        rootSignature->GetBufferPointer(),
-        rootSignature->GetBufferSize(),
+        mRootSignatureCPU->GetBufferPointer(),
+        mRootSignatureCPU->GetBufferSize(),
         IID_PPV_ARGS(&mRootSignature)
     );
 
@@ -34,22 +34,21 @@ Shader::Shader(ID3D12Device* device, DXGI_FORMAT rtvFormat, DXGI_FORMAT dsvForma
     inputLayout.push_back({ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
     inputLayout.push_back({ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
 
-    ID3DBlob* vs = CompileShader(L"Shaders/VS.hlsl", nullptr, "VS", "vs_5_1");
-    ID3DBlob* ps = CompileShader(L"Shaders/PS.hlsl", nullptr, "PS", "ps_5_1");
+    mVertexShaderCPU = CompileShader(L"Shaders/VS.hlsl", nullptr, "VS", "vs_5_1");
+    mPixelShaderCPU = CompileShader(L"Shaders/PS.hlsl", nullptr, "PS", "ps_5_1");
     
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
-    ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc {};
     psoDesc.pRootSignature = mRootSignature;
     psoDesc.InputLayout = { inputLayout.data(), (UINT)inputLayout.size() };
     psoDesc.VS = 
     {
-        reinterpret_cast<BYTE*>(vs->GetBufferPointer()), 
-        vs->GetBufferSize() 
+        reinterpret_cast<BYTE*>(mVertexShaderCPU->GetBufferPointer()), 
+        mVertexShaderCPU->GetBufferSize() 
     };
     psoDesc.PS = 
     { 
-        reinterpret_cast<BYTE*>(ps->GetBufferPointer()), 
-        ps->GetBufferSize() 
+        reinterpret_cast<BYTE*>(mPixelShaderCPU->GetBufferPointer()), 
+        mPixelShaderCPU->GetBufferSize() 
     };
     psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
@@ -63,6 +62,16 @@ Shader::Shader(ID3D12Device* device, DXGI_FORMAT rtvFormat, DXGI_FORMAT dsvForma
     psoDesc.DSVFormat = dsvFormat;
     device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPSO));
     
+}
+
+Shader::~Shader()
+{
+    mPSO->Release();
+    mRootSignature->Release();
+
+    mRootSignatureCPU->Release();
+    mVertexShaderCPU->Release();
+    mPixelShaderCPU->Release();
 }
 
 ID3DBlob* Shader::CompileShader(const std::wstring& filename,
@@ -80,11 +89,14 @@ ID3DBlob* Shader::CompileShader(const std::wstring& filename,
     ID3DBlob* errors;
     HRESULT hr = D3DCompileFromFile(filename.c_str(), defines, D3D_COMPILE_STANDARD_FILE_INCLUDE,
         entrypoint.c_str(), target.c_str(), compileFlags, 0, &byteCode, &errors);
-
-    if(errors != nullptr)
-        OutputDebugStringA((char*)errors->GetBufferPointer());
-
-    if (FAILED(hr)) { std::cerr << "Failed to compile shader !\n"; return nullptr; }
+    
+    if (FAILED(hr))
+    {
+        _com_error err(hr);
+        LPCTSTR errMsg = err.ErrorMessage();
+        std::wcerr << "Failed to compile shader ! " << errMsg << "\n";
+        return nullptr;
+    }
 
     return byteCode;
     

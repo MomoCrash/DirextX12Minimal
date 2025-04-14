@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "d3dUtils.h"
+#include "Shader.h"
 #include "Transform.h"
 #include "UploadBuffer.h"
 #include "Window.h"
@@ -23,6 +24,7 @@ class RenderWindow : public Window
     
 public:
     RenderWindow(HINSTANCE hInstance);
+    ~RenderWindow() override;
     bool Initialize() override;
     void Update() override;
     
@@ -32,7 +34,7 @@ public:
     void CloseCommandList();
     
     void BeginDraw() override;
-    void Draw(Shader& shader, Geometrie& geo, UploadBuffer<ObjectData>* objectBuffer);
+    void Draw(Shader const& shader, Geometrie const& geo, UploadBuffer<ObjectData> const& objectBuffer);
     void EndDraw() override;
     
     void OnMouseDown(WPARAM btnState, int x, int y) override{}
@@ -45,5 +47,4 @@ public:
     DirectX::XMFLOAT4X4 mView;
     DirectX::XMFLOAT4X4 mProj;
     UploadBuffer<GlobalInformation>* mGlobalConstantBuffer;
-    Shader* mShader;
 };

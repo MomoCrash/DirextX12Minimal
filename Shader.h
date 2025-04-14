@@ -6,8 +6,13 @@ class Shader
 {
 public:
     Shader(ID3D12Device* device, DXGI_FORMAT rtvFormat, DXGI_FORMAT dsvFormat);
+    ~Shader();
     ID3DBlob* CompileShader(const std::wstring& filename, const D3D_SHADER_MACRO* defines, const std::string& entrypoint,  const std::string& target);
     
     ID3D12RootSignature* mRootSignature;
     ID3D12PipelineState* mPSO;
+
+    ID3DBlob* mVertexShaderCPU;
+    ID3DBlob* mPixelShaderCPU;
+    ID3DBlob* mRootSignatureCPU;
 };

@@ -313,7 +313,13 @@ void Window::OnResize()
 		D3D12_RESOURCE_STATE_COMMON,
         &optClear,
         IID_PPV_ARGS(&mDepthStencilBuffer));
-	if (FAILED(result)) { std::cerr << "Failed to create descriptor heap !\n"; return; }
+	
+	if (FAILED(result))
+	{
+		_com_error err(result);
+		LPCTSTR errMsg = err.ErrorMessage();
+		std::wcerr << "Failed to compile Depth Stencil View ! " << errMsg << "\n";
+	}
 
     // Create descriptor to mip level 0 of entire resource using the format of the resource.
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc;
@@ -365,12 +371,22 @@ void Window::CreateCommandObjects()
     queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 	
     HRESULT result = mDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&mCommandQueue));
-    if (FAILED(result)) { std::cerr << "Failed to create command queue!\n"; return; }
+	if (FAILED(result))
+	{
+		_com_error err(result);
+		LPCTSTR errMsg = err.ErrorMessage();
+		std::wcerr << "Failed to create Command Queue ! " << errMsg << "\n";
+	}
 	
     result = mDevice->CreateCommandAllocator(
         D3D12_COMMAND_LIST_TYPE_DIRECT,
         IID_PPV_ARGS(&mDirectCmdListAlloc));
-    if (FAILED(result)) { std::cerr << "Failed to create command allocator!\n"; return; }
+	if (FAILED(result))
+	{
+		_com_error err(result);
+		LPCTSTR errMsg = err.ErrorMessage();
+		std::wcerr << "Failed to create Command Allocator ! " << errMsg << "\n";
+	}
 
     result = mDevice->CreateCommandList(
         0,
@@ -378,7 +394,12 @@ void Window::CreateCommandObjects()
         mDirectCmdListAlloc, // Associated command allocator
         nullptr,                   // Initial PipelineStateObject
         IID_PPV_ARGS(&mCommandList));
-    if (FAILED(result)) { std::cerr << "Failed to create command list !\n"; return; }
+	if (FAILED(result))
+	{
+		_com_error err(result);
+		LPCTSTR errMsg = err.ErrorMessage();
+		std::wcerr << "Failed to create Command List ! " << errMsg << "\n";
+	}
 
     // Start off in a closed state.  This is because the first time we refer 
     // to the command list we will Reset it, and it needs to be closed before
@@ -420,7 +441,12 @@ void Window::CreateSwapChain()
         &sd, 
         &mSwapChain);
 	
-    if (FAILED(result)) { std::cerr << "Failed to create swap chain ! " << std::hex << result << "\n" ; return; }
+	if (FAILED(result))
+	{
+		_com_error err(result);
+		LPCTSTR errMsg = err.ErrorMessage();
+		std::wcerr << "Failed to create SwapChain ! " << errMsg << "\n";
+	}
 }
 
 void Window::CreateRtvAndDsvDescriptorHeaps()
@@ -432,7 +458,13 @@ void Window::CreateRtvAndDsvDescriptorHeaps()
     rtvHeapDesc.NodeMask = 0;
     HRESULT result = mDevice->CreateDescriptorHeap(
         &rtvHeapDesc, IID_PPV_ARGS(&mRtvHeap));
-    if (FAILED(result)) { std::cerr << "Failed to create RTV and DVS heaps !\n"; return; }
+	
+	if (FAILED(result))
+	{
+		_com_error err(result);
+		LPCTSTR errMsg = err.ErrorMessage();
+		std::wcerr << "Failed to create Render target View ! " << errMsg << "\n";
+	}
 
 
     D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc;

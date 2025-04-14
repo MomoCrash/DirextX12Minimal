@@ -27,6 +27,7 @@
 #include <sstream>
 #include <cassert>
 #include "d3dx12.h"
+#include "comdef.h"
 #include <DirectXColors.h>
 
 #pragma comment(lib,"d3dcompiler.lib")
@@ -35,6 +36,7 @@
 
 class d3dUtils
 {
+    
 public:
     static UINT CalcConstantBufferByteSize(UINT byteSize);
 

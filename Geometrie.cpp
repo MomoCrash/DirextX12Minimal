@@ -2,7 +2,14 @@
 
 #include "d3dUtils.h"
 
-void Geometrie::CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, float width, float height, float depth)
+Geometrie::~Geometrie()
+{
+	VertexBufferGPU->Release();
+	IndexBufferGPU->Release();
+
+}
+
+void Geometrie::InitializeAsCube(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, float width, float height, float depth)
 {
 	
 	MeshData meshData;
