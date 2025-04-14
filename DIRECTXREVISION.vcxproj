@@ -158,7 +158,6 @@
     <ClCompile Include="d3dUtils.cpp" />
     <ClCompile Include="Geometrie.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="RenderObject.cpp" />
     <ClCompile Include="RenderWindow.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Transform.cpp" />
@@ -169,12 +168,22 @@
     <ClInclude Include="d3dx12.h" />
     <ClInclude Include="Geometrie.h" />
     <ClInclude Include="main.h" />
-    <ClInclude Include="RenderObject.h" />
     <ClInclude Include="RenderWindow.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="UploadBuffer.h" />
     <ClInclude Include="Window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\PS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Shaders\Rootsignature.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Shaders\VS.hlsl">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

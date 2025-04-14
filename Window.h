@@ -17,7 +17,7 @@ public:
     
     virtual LRESULT InputHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-    bool PollWindowEvents(int& eventCode);
+    bool PollWindowEvents();
     virtual void Update() = 0;
     
     void Set4xMsaaState(bool value);
@@ -27,6 +27,8 @@ public:
 
     DXGI_FORMAT GetBackBufferFormat() const;
     DXGI_FORMAT GetDepthStencilFormat() const;
+
+    bool mIsOpen = true;
 
 protected:
     bool InitializeWindow();
@@ -48,24 +50,12 @@ protected:
     D3D12_CPU_DESCRIPTOR_HANDLE GetCurrentBackBufferView() const;
     D3D12_CPU_DESCRIPTOR_HANDLE GetDepthStencilView() const;
 
-
-    // Convenience overrides for handling mouse input.
-    virtual void OnMouseDown(WPARAM btnState, int x, int y) = 0;
-    virtual void OnMouseUp(WPARAM btnState, int x, int y)   = 0;
-    virtual void OnMouseMove(WPARAM btnState, int x, int y) = 0;
-    virtual void OnKeyPressed(WPARAM btnState, int x, int y) = 0;
-
     static Window* instance;
 
     float mSecondsPerCount;
     
     HINSTANCE mwInstance;
     HWND mWindow = nullptr; // main window handle
-    bool      mAppPaused = false;  // is the application paused?
-    bool      mMinimized = false;  // is the application minimized?
-    bool      mMaximized = false;  // is the application maximized?
-    bool      mResizing = false;   // are the resize bars being dragged?
-    bool      mFullscreenState = false;// fullscreen enabled
     
     ID3D12Device* mDevice;
     IDXGISwapChain* mSwapChain;

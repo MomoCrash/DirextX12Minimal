@@ -27,10 +27,8 @@ public:
             IID_PPV_ARGS(&mUploadBuffer));
 
         mUploadBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mMappedData));
+        mUploadBuffer->SetName(L"Constant Buffer");
     }
-
-    UploadBuffer(const UploadBuffer& rhs) = delete;
-    UploadBuffer& operator=(const UploadBuffer& rhs) = delete;
 
     ~UploadBuffer()
     {

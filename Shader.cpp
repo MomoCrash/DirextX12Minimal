@@ -42,8 +42,8 @@ Shader::Shader(ID3D12Device* device, DXGI_FORMAT rtvFormat, DXGI_FORMAT dsvForma
     D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc{};
     psoDesc.pRootSignature = mRootSignature;
     psoDesc.InputLayout = { inputLayout, _countof(inputLayout)};
-    psoDesc.VS = {reinterpret_cast<BYTE*>(mVertexShaderCPU->GetBufferPointer()), mVertexShaderCPU->GetBufferSize() };
-    psoDesc.PS = { reinterpret_cast<BYTE*>(mPixelShaderCPU->GetBufferPointer()), mPixelShaderCPU->GetBufferSize() };
+    psoDesc.VS = {mVertexShaderCPU->GetBufferPointer(), mVertexShaderCPU->GetBufferSize() };
+    psoDesc.PS = { mPixelShaderCPU->GetBufferPointer(), mPixelShaderCPU->GetBufferSize() };
     psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
     psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
@@ -60,12 +60,13 @@ Shader::Shader(ID3D12Device* device, DXGI_FORMAT rtvFormat, DXGI_FORMAT dsvForma
 
 Shader::~Shader()
 {
-    mPSO->Release();
-    mRootSignature->Release();
 
     mRootSignatureCPU->Release();
     mVertexShaderCPU->Release();
     mPixelShaderCPU->Release();
+
+    mRootSignature->Release();
+    mPSO->Release();
 }
 
 ID3DBlob* Shader::CompileShader(const std::wstring& filename,
@@ -75,6 +76,7 @@ ID3DBlob* Shader::CompileShader(const std::wstring& filename,
 {
 
     UINT compileFlags = 0;
+
 #if defined(DEBUG) || defined(_DEBUG)  
     compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 #endif
@@ -83,7 +85,7 @@ ID3DBlob* Shader::CompileShader(const std::wstring& filename,
     ID3DBlob* errors;
     HRESULT hr = D3DCompileFromFile(filename.c_str(), defines, D3D_COMPILE_STANDARD_FILE_INCLUDE,
         entrypoint.c_str(), target.c_str(), compileFlags, 0, &byteCode, &errors);
-    
+
     if (FAILED(hr))
     {
         _com_error err(hr);

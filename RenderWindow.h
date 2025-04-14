@@ -10,11 +10,15 @@
 class Shader;
 class Geometrie;
 
+struct ObjectData
+{
+    DirectX::XMFLOAT4X4 World;
+};
+
 struct PassData
 {
     DirectX::XMFLOAT4X4 ViewProj;
 };
-
 
 class RenderWindow : public Window
 {
@@ -31,14 +35,10 @@ public:
     void CloseCommandList();
     
     void BeginDraw() override;
+
     template <class ObjectData>
     void Draw(Shader const& shader, Geometrie const& geo, UploadBuffer<ObjectData>* objectBuffer);
     void EndDraw() override;
-    
-    void OnMouseDown(WPARAM btnState, int x, int y) override{}
-    void OnMouseUp(WPARAM btnState, int x, int y) override{}
-    void OnMouseMove(WPARAM btnState, int x, int y) override{}
-    void OnKeyPressed(WPARAM btnState, int x, int y) override{}
     
     TRANSFORM cam;
     

@@ -2,17 +2,8 @@
 
 #include "d3dUtils.h"
 
-Geometrie::~Geometrie()
-{
-	VertexBufferGPU->Release();
-	IndexBufferGPU->Release();
-
-}
-
 void Geometrie::InitializeAsCube(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
-	
-	MeshData meshData;
 
 	Vertex v[24] {
 		// FRONT
@@ -53,12 +44,7 @@ void Geometrie::InitializeAsCube(ID3D12Device* device, ID3D12GraphicsCommandList
 
 	};
 
-	meshData.Vertices.assign(&v[0], &v[24]);
- 
-	//
-	// Create the indices.
-	//
-	uint32_t i[36] {
+	uint16 i[36] {
 		// FRONT
 		0, 1, 2,
 		0, 2, 3,
@@ -84,17 +70,15 @@ void Geometrie::InitializeAsCube(ID3D12Device* device, ID3D12GraphicsCommandList
 		20, 22, 23
 	};
 
-	meshData.Indices16.assign(&i[0], &i[36]);
-
-	const UINT vbByteSize = (UINT)meshData.Vertices.size() * sizeof(Vertex);
-	const UINT ibByteSize = (UINT)meshData.Indices16.size() * sizeof(uint16);
+	const size_t vbByteSize = _countof(v) * sizeof(Vertex);
+	const size_t ibByteSize = _countof(i) * sizeof(uint16);
 
 	// Copy the triangle data to the vertex buffer.
-	VertexBufferGPU = d3dUtils::CreateBuffer(device, commandList, meshData.Vertices.data(), vbByteSize);
+	VertexBufferGPU = d3dUtils::CreateBuffer(device, commandList, v, vbByteSize);
 	VertexBufferGPU->SetName(L"VERTEX_BUFFER");
 	
 	// Copy the triangle data to the indices buffer.
-	IndexBufferGPU = d3dUtils::CreateBuffer(device, commandList, meshData.Indices16.data(), ibByteSize);
+	IndexBufferGPU = d3dUtils::CreateBuffer(device, commandList, i, ibByteSize);
 	IndexBufferGPU->SetName(L"INDEX_BUFFER");
 
 	// Initialize the vertex buffer view.
@@ -104,5 +88,31 @@ void Geometrie::InitializeAsCube(ID3D12Device* device, ID3D12GraphicsCommandList
 	// Initialize the indices buffer view.
 	IndexFormat = DXGI_FORMAT_R16_UINT;
 	IndexBufferByteSize = ibByteSize;
-	IndicesCount = meshData.Indices16.size();
+	IndicesCount = _countof(i);
+}
+
+D3D12_VERTEX_BUFFER_VIEW Geometrie::VertexBufferView() const
+{
+	D3D12_VERTEX_BUFFER_VIEW vbv;
+	vbv.BufferLocation = VertexBufferGPU->GetGPUVirtualAddress();
+	vbv.StrideInBytes = VertexByteStride;
+	vbv.SizeInBytes = VertexBufferByteSize;
+
+	return vbv;
+}
+
+D3D12_INDEX_BUFFER_VIEW Geometrie::IndexBufferView() const
+{
+	D3D12_INDEX_BUFFER_VIEW ibv;
+	ibv.BufferLocation = IndexBufferGPU->GetGPUVirtualAddress();
+	ibv.Format = IndexFormat;
+	ibv.SizeInBytes = IndexBufferByteSize;
+
+	return ibv;
+}
+
+Geometrie::~Geometrie()
+{
+	VertexBufferGPU->Release();
+	IndexBufferGPU->Release();
 }

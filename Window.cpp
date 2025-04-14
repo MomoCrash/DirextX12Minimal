@@ -41,7 +41,6 @@ Window::Window(HINSTANCE winInsance)
 
 Window::~Window()
 {
-	mDevice->Release();
 	mSwapChain->Release();
 	mdxgiFactory->Release();
 
@@ -57,6 +56,7 @@ Window::~Window()
 	mSwapChainBuffer[0]->Release();
 	mSwapChainBuffer[1]->Release();
 	mDepthStencilBuffer->Release();
+	mDevice->Release();
 }
 
 Window* Window::GetInstance()
@@ -142,8 +142,7 @@ bool Window::InitializeWindow()
 	int width  = R.right - R.left;
 	int height = R.bottom - R.top;
 
-	mWindow = CreateWindow(L"MainWnd", L"LA fenetre", 
-		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, 0, 0, mwInstance, 0); 
+	mWindow = CreateWindow(L"MainWnd", L"LA fenetre", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, 0, 0, mwInstance, 0); 
 	if( !mWindow )
 	{
 		MessageBox(0, L"CreateWindow Failed.", 0, 0);
@@ -434,12 +433,8 @@ void Window::CreateRtvAndDsvDescriptorHeaps()
 
 void Window::FlushCommandQueue()
 {
-    // Advance the fence value to mark commands up to this fence point.
     mCurrentFence++;
 
-    // Add an instruction to the command queue to set a new fence point.  Because we 
-    // are on the GPU timeline, the new fence point won't be set until the GPU finishes
-    // processing all the commands prior to this Signal().
     mCommandQueue->Signal(mFence, mCurrentFence);
 
     // Wait until the GPU has completed commands up to this fence point.
@@ -489,6 +484,7 @@ LRESULT Window::InputHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		return 0;
 	case WM_DESTROY:
 		PostQuitMessage(0);
+		mIsOpen = false;
 		return 0;
 	default: break;
 	}
@@ -496,14 +492,13 @@ LRESULT Window::InputHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-bool Window::PollWindowEvents(int& eventCode)
+bool Window::PollWindowEvents()
 {
 	MSG msg = {};
 	if(PeekMessage( &msg, 0, 0, 0, PM_REMOVE ))
 	{
 		TranslateMessage( &msg );
 		DispatchMessage( &msg );
-		eventCode = static_cast<int>(msg.message);
 		return true;
 	}
 	return false;

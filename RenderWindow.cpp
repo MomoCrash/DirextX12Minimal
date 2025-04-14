@@ -27,6 +27,9 @@ bool RenderWindow::Initialize()
 
 void RenderWindow::Update()
 {
+
+    PollWindowEvents();
+
     // J'ai rajouter une matrice pour la position de la cam
     XMStoreFloat4x4(&mView, XMMatrixInverse(nullptr, cam.GetMatrix()));
     

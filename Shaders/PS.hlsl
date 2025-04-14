@@ -11,7 +11,6 @@ cbuffer cbPass : register(b1)
 struct VS_VertexOut
 {
     float4 PosH : SV_POSITION;
-    float3 PosW : POSITION;
     float4 Color : COLOR;
 };
 

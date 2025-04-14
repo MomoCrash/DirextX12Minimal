@@ -7,11 +7,8 @@ UINT d3dUtils::CalcConstantBufferByteSize(UINT byteSize)
 
 ID3D12Resource* d3dUtils::CreateBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, const void* initData, UINT64 byteSize)
 {
-    
-
     ID3D12Resource* defaultBuffer;
     ID3D12Resource* uploadBuffer;
-
 
     CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
     CD3DX12_RESOURCE_DESC descriptor = CD3DX12_RESOURCE_DESC::Buffer(byteSize);

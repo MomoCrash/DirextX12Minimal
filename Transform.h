@@ -23,7 +23,6 @@ private:
     XMFLOAT4X4 mmMatrix;
     bool mIsUpdated = true;
 
-    void UpdateMatrix();
 public:
     TRANSFORM();
     TRANSFORM(
@@ -62,5 +61,6 @@ public:
     XMMATRIX XM_CALLCONV operator * (FXMMATRIX _other);
     XMVECTOR operator * (const XMFLOAT3& _other);
 
+    void UpdateMatrix();
     void Reset();
 };

@@ -17,19 +17,16 @@ struct VS_VertexIn
 struct VS_VertexOut
 {
     float4 PosH : SV_POSITION;
-    float3 PosW : POSITION;
     float4 Color : COLOR;
 };
 
 VS_VertexOut VS(VS_VertexIn vin)
 {
     VS_VertexOut vout;
-    
-    // Transform to homogeneous clip space.
+
     float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
     vout.PosH = mul(posW, gViewProj);
-    
-    vout.PosW = posW.xyz;
+
     vout.Color = vin.Color;
 	
     return vout;
