@@ -11,13 +11,17 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 
     Geometrie geo = Geometrie();
     geo.InitializeAsCube(window.GetDevice(), window.GetCommandList());
+    
+    window.cam.Reset();
+    window.cam.SetPosition(XMFLOAT3{ 0.0f, 0.0f, -5.0f });
+    window.cam.SetRotationYPR(XMFLOAT3{ 0.0f, 0.0f, 0.0f });
 
     Shader shader = Shader(window.GetDevice(), window.GetBackBufferFormat(), window.GetDepthStencilFormat());;
     
     window.CloseCommandList();
 
     std::vector<RenderObject> sceneObjects {
-        { window.GetDevice(), geo, shader, 10, 10, 10 },
+        { window.GetDevice(), geo, shader, 0, 0, 0 },
         { window.GetDevice(), geo, shader, 12, 10, 10 },
         { window.GetDevice(), geo, shader, 13, 10, 10 },
         { window.GetDevice(), geo, shader, 14, 10, 10 }
@@ -26,7 +30,9 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
     bool closed = false;
     float angle = 0;
     float time = 0;
+
     while (!closed) {
+
         time += 0.001f;
         window.Update();
         int event;

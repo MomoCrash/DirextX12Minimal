@@ -10,7 +10,7 @@
 class Shader;
 class Geometrie;
 
-struct GlobalInformation
+struct PassData
 {
     DirectX::XMFLOAT4X4 ViewProj;
 };
@@ -44,7 +44,7 @@ public:
     
     DirectX::XMFLOAT4X4 mView;
     DirectX::XMFLOAT4X4 mProj;
-    UploadBuffer<GlobalInformation>* mGlobalConstantBuffer;
+    UploadBuffer<PassData>* mPassDataBuffer;
 };
 
 template <class ObjectData>
@@ -55,7 +55,7 @@ void RenderWindow::Draw(Shader const& shader, Geometrie const& geo, UploadBuffer
     mCommandList->SetPipelineState(shader.mPSO);
 
     mCommandList->SetGraphicsRootConstantBufferView(0, objectBuffer->Resource()->GetGPUVirtualAddress());
-    mCommandList->SetGraphicsRootConstantBufferView(1, mGlobalConstantBuffer->Resource()->GetGPUVirtualAddress());
+    mCommandList->SetGraphicsRootConstantBufferView(1, mPassDataBuffer->Resource()->GetGPUVirtualAddress());
 
     D3D12_VERTEX_BUFFER_VIEW vertexBuffer = geo.VertexBufferView();
     D3D12_INDEX_BUFFER_VIEW indexBuffer = geo.IndexBufferView();

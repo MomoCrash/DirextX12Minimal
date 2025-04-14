@@ -1,0 +1,33 @@
+cbuffer cbPerObject : register(b0)
+{
+    float4x4 gWorld;
+};
+
+cbuffer cbPass : register(b1)
+{
+    float4x4 gViewProj;
+};
+
+struct VS_VertexIn
+{
+    float3 PosL : POSITION;
+    float4 Color : COLOR;
+};
+
+struct VS_VertexOut
+{
+    float4 PosH : SV_POSITION;
+    float4 Color : COLOR;
+};
+
+VS_VertexOut VS(VS_VertexIn vin)
+{
+    VS_VertexOut vout;
+    
+    float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
+    vout.PosH = mul(posW, gViewProj);
+    
+    vout.Color = vin.Color;
+    
+    return vout;
+}

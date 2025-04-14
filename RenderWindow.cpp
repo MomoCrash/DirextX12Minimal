@@ -6,13 +6,11 @@
 
 using namespace DirectX ;
 
-RenderWindow::RenderWindow(HINSTANCE hInstance) : Window(hInstance), mView(), mProj(), mGlobalConstantBuffer(nullptr)
-{
-}
+RenderWindow::RenderWindow(HINSTANCE hInstance) : Window(hInstance), mView(), mProj(), mPassDataBuffer(nullptr) {}
 
 RenderWindow::~RenderWindow() 
 {
-    delete mGlobalConstantBuffer;
+    delete mPassDataBuffer;
 }
 
 bool RenderWindow::Initialize()
@@ -21,12 +19,8 @@ bool RenderWindow::Initialize()
 
     OpenCommandList();
 
-    cam.Reset();
-    cam.SetPosition(XMFLOAT3{ 0.0f, 0.0f, -5.0f });
-    cam.SetRotationYPR(XMFLOAT3{ 0.0f, 0.0f, 0.0f });
-
-    mGlobalConstantBuffer = new UploadBuffer<GlobalInformation>(mDevice, 1, true);
-    mGlobalConstantBuffer->Resource()->SetName(L"PASS_BUFFER");
+    mPassDataBuffer = new UploadBuffer<PassData>(mDevice, 1, true);
+    mPassDataBuffer->Resource()->SetName(L"PASS_BUFFER");
 
     return 1;
 }
@@ -41,10 +35,10 @@ void RenderWindow::Update()
 
     XMMATRIX viewProj = XMMatrixMultiply(view, proj);
 
-    GlobalInformation info;
+    PassData info;
     XMStoreFloat4x4(&info.ViewProj, XMMatrixTranspose(viewProj));
 
-    mGlobalConstantBuffer->CopyData(0, info);
+    mPassDataBuffer->CopyData(0, info);
 }
 
 void RenderWindow::OnResize()
@@ -58,18 +52,10 @@ void RenderWindow::OpenCommandList()
 {
     mDirectCmdListAlloc->Reset();
     mCommandList->Reset(mDirectCmdListAlloc, nullptr);
-
-    CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(GetCurrentBackBuffer(),
-        D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-    mCommandList->ResourceBarrier(1, &barrier);
 }
 
 void RenderWindow::CloseCommandList()
 {
-    CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(GetCurrentBackBuffer(),
-    D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-    mCommandList->ResourceBarrier(1, &barrier);
-
     mCommandList->Close();
     ID3D12CommandList* cmdsLists[] = { mCommandList };
     mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
@@ -81,6 +67,10 @@ void RenderWindow::BeginDraw()
 {
 
     OpenCommandList();
+
+    CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(GetCurrentBackBuffer(),
+        D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+    mCommandList->ResourceBarrier(1, &barrier);
 	
     mCommandList->RSSetViewports(1, &mScreenViewport);
     mCommandList->RSSetScissorRects(1, &mScissorRect);
@@ -88,11 +78,10 @@ void RenderWindow::BeginDraw()
     CD3DX12_CPU_DESCRIPTOR_HANDLE currentBackBufferView(mRtvHeap->GetCPUDescriptorHandleForHeapStart(), mCurrBackBuffer, mRtvDescriptorSize);
     D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = GetDepthStencilView();
 
-    mCommandList->ClearRenderTargetView(currentBackBufferView, DirectX::Colors::LightSteelBlue, 0, nullptr);
-    mCommandList->ClearDepthStencilView(depthStencilView, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
-
     mCommandList->OMSetRenderTargets(1, &currentBackBufferView, true, &depthStencilView);
 
+    mCommandList->ClearRenderTargetView(currentBackBufferView, DirectX::Colors::LightSteelBlue, 0, nullptr);
+    mCommandList->ClearDepthStencilView(depthStencilView, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
 }
 
@@ -101,13 +90,9 @@ void RenderWindow::EndDraw()
     CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(GetCurrentBackBuffer(),
         D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
     mCommandList->ResourceBarrier(1, &barrier);
-    
-    mCommandList->Close();
-    ID3D12CommandList* cmdsLists[] = { mCommandList };
-    mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
-	
+
+    CloseCommandList();
+
     mSwapChain->Present(0, 0);
-    mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
-	
-    FlushCommandQueue();
+    mCurrBackBuffer = 1 - mCurrBackBuffer;
 }

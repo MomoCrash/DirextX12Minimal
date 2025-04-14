@@ -21,6 +21,15 @@ Shader::Shader(ID3D12Device* device, DXGI_FORMAT rtvFormat, DXGI_FORMAT dsvForma
     D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
         &serializedRootSig, &errorBlob);*/
 
+
+    D3D12_INPUT_ELEMENT_DESC inputLayout[]
+    {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+    };
+
+    mVertexShaderCPU = CompileShader(L"Shaders/VS.hlsl", nullptr, "VS", "vs_5_1");
+    mPixelShaderCPU = CompileShader(L"Shaders/PS.hlsl", nullptr, "PS", "ps_5_1");
     mRootSignatureCPU = CompileShader(L"Shaders/Rootsignature.hlsl", nullptr, "ROOTSIG", "rootsig_1_1");
     
     device->CreateRootSignature(
@@ -29,27 +38,12 @@ Shader::Shader(ID3D12Device* device, DXGI_FORMAT rtvFormat, DXGI_FORMAT dsvForma
         mRootSignatureCPU->GetBufferSize(),
         IID_PPV_ARGS(&mRootSignature)
     );
-
-    std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout;
-    inputLayout.push_back({ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
-    inputLayout.push_back({ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
-
-    mVertexShaderCPU = CompileShader(L"Shaders/VS.hlsl", nullptr, "VS", "vs_5_1");
-    mPixelShaderCPU = CompileShader(L"Shaders/PS.hlsl", nullptr, "PS", "ps_5_1");
     
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc {};
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc{};
     psoDesc.pRootSignature = mRootSignature;
-    psoDesc.InputLayout = { inputLayout.data(), (UINT)inputLayout.size() };
-    psoDesc.VS = 
-    {
-        reinterpret_cast<BYTE*>(mVertexShaderCPU->GetBufferPointer()), 
-        mVertexShaderCPU->GetBufferSize() 
-    };
-    psoDesc.PS = 
-    { 
-        reinterpret_cast<BYTE*>(mPixelShaderCPU->GetBufferPointer()), 
-        mPixelShaderCPU->GetBufferSize() 
-    };
+    psoDesc.InputLayout = { inputLayout, _countof(inputLayout)};
+    psoDesc.VS = {reinterpret_cast<BYTE*>(mVertexShaderCPU->GetBufferPointer()), mVertexShaderCPU->GetBufferSize() };
+    psoDesc.PS = { reinterpret_cast<BYTE*>(mPixelShaderCPU->GetBufferPointer()), mPixelShaderCPU->GetBufferSize() };
     psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
     psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);

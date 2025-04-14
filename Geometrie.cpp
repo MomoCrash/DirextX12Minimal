@@ -28,10 +28,10 @@ void Geometrie::InitializeAsCube(ID3D12Device* device, ID3D12GraphicsCommandList
 		{{ -.5f,  .5f,  .5f }, {  0, 1, 1, 1 }},	// 7 
 
 		// LEFT
-		{{ -.5f, -.5f,  .5f }, { 0, 0, 1, 1 }},	// 8
-		{{ -.5f,  .5f,  .5f }, { 0, 1, 1, 1 }},	// 9
-		{{ -.5f,  .5f, -.5f }, { 0, 1, 0, 1 }},	// 10
-		{{ -.5f, -.5f, -.5f }, { 0, 0, 0, 1 }},	// 11
+		{{ -.5f, -.5f,  .5f }, { 0, 0, 1, 1 }},		// 8
+		{{ -.5f,  .5f,  .5f }, { 0, 1, 1, 1 }},		// 9
+		{{ -.5f,  .5f, -.5f }, { 0, 1, 0, 1 }},		// 10
+		{{ -.5f, -.5f, -.5f }, { 0, 0, 0, 1 }},		// 11
 
 		// RIGHT
 		{{  .5f, -.5f, -.5f }, {  1, 0, 0, 1 }},	// 12
@@ -90,11 +90,11 @@ void Geometrie::InitializeAsCube(ID3D12Device* device, ID3D12GraphicsCommandList
 	const UINT ibByteSize = (UINT)meshData.Indices16.size() * sizeof(uint16);
 
 	// Copy the triangle data to the vertex buffer.
-	VertexBufferGPU = d3dUtils::CreateBuffer(device, commandList, meshData.Vertices.data(), vbByteSize, VertexBufferUploader);
+	VertexBufferGPU = d3dUtils::CreateBuffer(device, commandList, meshData.Vertices.data(), vbByteSize);
 	VertexBufferGPU->SetName(L"VERTEX_BUFFER");
 	
 	// Copy the triangle data to the indices buffer.
-	IndexBufferGPU = d3dUtils::CreateBuffer(device, commandList, meshData.Indices16.data(), ibByteSize, IndexBufferUploader);
+	IndexBufferGPU = d3dUtils::CreateBuffer(device, commandList, meshData.Indices16.data(), ibByteSize);
 	IndexBufferGPU->SetName(L"INDEX_BUFFER");
 
 	// Initialize the vertex buffer view.
@@ -105,11 +105,4 @@ void Geometrie::InitializeAsCube(ID3D12Device* device, ID3D12GraphicsCommandList
 	IndexFormat = DXGI_FORMAT_R16_UINT;
 	IndexBufferByteSize = ibByteSize;
 	IndicesCount = meshData.Indices16.size();
-
-	delete VertexBufferUploader;
-	delete IndexBufferUploader;
-	
-	VertexBufferUploader = nullptr;
-	IndexBufferUploader = nullptr;
-	
 }

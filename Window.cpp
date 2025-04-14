@@ -13,21 +13,10 @@
 #include <d3d12.h>
 #include <D3Dcompiler.h>
 #include <DirectXMath.h>
-#include <DirectXPackedVector.h>
-#include <DirectXColors.h>
-#include <DirectXCollision.h>
 #include <string>
-#include <memory>
-#include <algorithm>
-#include <vector>
-#include <array>
-#include <unordered_map>
-#include <cstdint>
 #include <fstream>
-#include <sstream>
 #include <cassert>
 #include "d3dx12.h"
-#include <DirectXColors.h>
 
 #pragma comment(lib,"d3dcompiler.lib")
 #pragma comment(lib, "d3d12.lib")
@@ -35,8 +24,6 @@
 
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	// Forward hwnd on because we can get messages (e.g., WM_CREATE)
-	// before CreateWindow returns, and thus before mhMainWnd is valid.
 	return Window::GetInstance()->InputHandler(hwnd, msg, wParam, lParam);
 }
 
@@ -50,9 +37,6 @@ Window::Window(HINSTANCE winInsance)
 	assert(instance == nullptr);
 	instance = this;
 
-	__int64 countsPerSec;
-	QueryPerformanceFrequency((LARGE_INTEGER*)&countsPerSec);
-	mSecondsPerCount = 1.0 / static_cast<double>(countsPerSec);
 }
 
 Window::~Window()
@@ -133,11 +117,6 @@ DXGI_FORMAT Window::GetDepthStencilFormat() const
 
 bool Window::InitializeWindow()
 {
-	    
-	// Enable run-time memory check for debug builds.
-#if defined(DEBUG) | defined(_DEBUG)
-	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-#endif
 
 	WNDCLASS wc;
 	wc.style         = CS_HREDRAW | CS_VREDRAW;
@@ -147,7 +126,7 @@ bool Window::InitializeWindow()
 	wc.hInstance     = mwInstance;
 	wc.hIcon         = LoadIcon(0, IDI_APPLICATION);
 	wc.hCursor       = LoadCursor(0, IDC_ARROW);
-	wc.hbrBackground = NULL;//(HBRUSH)GetStockObject(NULL_BRUSH);
+	wc.hbrBackground = NULL;
 	wc.lpszMenuName  = 0;
 	wc.lpszClassName = L"MainWnd";
 
@@ -191,25 +170,9 @@ bool Window::InitializeDirectX()
 
     CreateDXGIFactory1(IID_PPV_ARGS(&mdxgiFactory));
 	
-    // Try to create hardware device.
-    HRESULT hardwareResult = D3D12CreateDevice(
-        nullptr,             // default adapter
-        D3D_FEATURE_LEVEL_12_0,
-        IID_PPV_ARGS(&mDevice));
 
-    // Fallback to WARP device.
-    if(FAILED(hardwareResult))
-    {
-        IDXGIAdapter* pWarpAdapter;
-        mdxgiFactory->EnumWarpAdapter(IID_PPV_ARGS(&pWarpAdapter));
+    HRESULT hardwareResult = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&mDevice));
 
-        D3D12CreateDevice(
-            pWarpAdapter,
-            D3D_FEATURE_LEVEL_11_0,
-            IID_PPV_ARGS(&mDevice));
-    }
-
-	// FENCE : Vigile du GPU
     mDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&mFence));
 
 	// CONSTANTES
@@ -217,9 +180,6 @@ bool Window::InitializeDirectX()
     mDsvDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
     mCbvSrvUavDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-    // Check 4X MSAA quality support for our back buffer format.
-    // All Direct3D 11 capable devices support 4X MSAA for all render 
-    // target formats, so we only need to check quality support.
     D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS msQualityLevels;
     msQualityLevels.Format = mBackBufferFormat;
     msQualityLevels.SampleCount = 4;
@@ -289,11 +249,6 @@ void Window::OnResize()
     depthStencilDesc.Height = mClientHeight;
     depthStencilDesc.DepthOrArraySize = 1;
     depthStencilDesc.MipLevels = 1;
-	// Correction 11/12/2016: SSAO chapter requires an SRV to the depth buffer to read from 
-	// the depth buffer.  Therefore, because we need to create two views to the same resource:
-	//   1. SRV format: DXGI_FORMAT_R24_UNORM_X8_TYPELESS
-	//   2. DSV Format: DXGI_FORMAT_D24_UNORM_S8_UINT
-	// we need to create the depth buffer resource with a typeless format.  
 	depthStencilDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
 
     depthStencilDesc.SampleDesc.Count = m4xMsaaState ? 4 : 1;

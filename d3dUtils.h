@@ -41,10 +41,9 @@ public:
     static UINT CalcConstantBufferByteSize(UINT byteSize);
 
     static ID3D12Resource* CreateBuffer(
-        ID3D12Device* device,
-        ID3D12GraphicsCommandList* commandList,
-        const void* initData,
-        UINT64 byteSize,
-        ID3D12Resource* uploadBuffer);
+	    ID3D12Device* device,
+	    ID3D12GraphicsCommandList* commandList,
+	    const void* initData,
+	    UINT64 byteSize);
     
 };

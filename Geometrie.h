@@ -35,9 +35,6 @@ public:
     ID3D12Resource* VertexBufferGPU = nullptr;
     ID3D12Resource* IndexBufferGPU = nullptr;
 
-    // Uploader
-    ID3D12Resource* VertexBufferUploader = nullptr;
-    ID3D12Resource* IndexBufferUploader = nullptr;
 
     // Les donnees pour dessiner a l'eran
     UINT VertexByteStride = 0;
