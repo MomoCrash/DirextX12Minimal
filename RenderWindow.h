@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "d3dUtils.h"
+#include "Geometrie.h"
 #include "Shader.h"
 #include "Transform.h"
 #include "UploadBuffer.h"
@@ -8,10 +9,6 @@
 
 class Shader;
 class Geometrie;
-
-struct ObjectData {
-    DirectX::XMFLOAT4X4 world;
-};
 
 struct GlobalInformation
 {
@@ -34,7 +31,8 @@ public:
     void CloseCommandList();
     
     void BeginDraw() override;
-    void Draw(Shader const& shader, Geometrie const& geo, UploadBuffer<ObjectData> const& objectBuffer);
+    template <class ObjectData>
+    void Draw(Shader const& shader, Geometrie const& geo, UploadBuffer<ObjectData>* objectBuffer);
     void EndDraw() override;
     
     void OnMouseDown(WPARAM btnState, int x, int y) override{}
@@ -48,3 +46,24 @@ public:
     DirectX::XMFLOAT4X4 mProj;
     UploadBuffer<GlobalInformation>* mGlobalConstantBuffer;
 };
+
+template <class ObjectData>
+void RenderWindow::Draw(Shader const& shader, Geometrie const& geo, UploadBuffer<ObjectData>* objectBuffer)
+{
+    
+    mCommandList->SetGraphicsRootSignature(shader.mRootSignature);
+    mCommandList->SetPipelineState(shader.mPSO);
+
+    mCommandList->SetGraphicsRootConstantBufferView(0, objectBuffer->Resource()->GetGPUVirtualAddress());
+    mCommandList->SetGraphicsRootConstantBufferView(1, mGlobalConstantBuffer->Resource()->GetGPUVirtualAddress());
+
+    D3D12_VERTEX_BUFFER_VIEW vertexBuffer = geo.VertexBufferView();
+    D3D12_INDEX_BUFFER_VIEW indexBuffer = geo.IndexBufferView();
+
+    mCommandList->IASetVertexBuffers(0, 1, &vertexBuffer);
+    mCommandList->IASetIndexBuffer(&indexBuffer);
+    mCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    
+    mCommandList->DrawIndexedInstanced(geo.IndicesCount, 1, 0, 0, 0);
+    
+}

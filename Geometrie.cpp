@@ -9,14 +9,10 @@ Geometrie::~Geometrie()
 
 }
 
-void Geometrie::InitializeAsCube(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, float width, float height, float depth)
+void Geometrie::InitializeAsCube(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
 	
 	MeshData meshData;
-	
-	float w2 = 0.5f*width;
-	float h2 = 0.5f*height;
-	float d2 = 0.5f*depth;
 
 	Vertex v[24] {
 		// FRONT

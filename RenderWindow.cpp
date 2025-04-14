@@ -96,26 +96,6 @@ void RenderWindow::BeginDraw()
 
 }
 
-void RenderWindow::Draw(Shader const& shader, Geometrie const& geo, UploadBuffer<ObjectData> const& buffer)
-{
-
-    mCommandList->SetGraphicsRootSignature(shader.mRootSignature);
-    mCommandList->SetPipelineState(shader.mPSO);
-
-    mCommandList->SetGraphicsRootConstantBufferView(0, buffer.Resource()->GetGPUVirtualAddress());
-    mCommandList->SetGraphicsRootConstantBufferView(1, mGlobalConstantBuffer->Resource()->GetGPUVirtualAddress());
-
-    D3D12_VERTEX_BUFFER_VIEW vertexBuffer = geo.VertexBufferView();
-    D3D12_INDEX_BUFFER_VIEW indexBuffer = geo.IndexBufferView();
-
-    mCommandList->IASetVertexBuffers(0, 1, &vertexBuffer);
-    mCommandList->IASetIndexBuffer(&indexBuffer);
-    mCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    
-    mCommandList->DrawIndexedInstanced(geo.IndicesCount, 1, 0, 0, 0);
-    
-}
-
 void RenderWindow::EndDraw()
 {
     CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(GetCurrentBackBuffer(),
