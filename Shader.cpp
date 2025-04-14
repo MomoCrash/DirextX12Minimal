@@ -3,7 +3,7 @@
 
 Shader::Shader(ID3D12Device* device, DXGI_FORMAT rtvFormat, DXGI_FORMAT dsvFormat)
 {
-    std::vector<CD3DX12_ROOT_PARAMETER> slotRootParameter(2);
+    /*std::vector<CD3DX12_ROOT_PARAMETER> slotRootParameter(2);
 
     slotRootParameter[0].InitAsConstantBufferView(0);
     slotRootParameter[1].InitAsConstantBufferView(1);
@@ -19,12 +19,14 @@ Shader::Shader(ID3D12Device* device, DXGI_FORMAT rtvFormat, DXGI_FORMAT dsvForma
     ID3DBlob* serializedRootSig = nullptr;
     ID3DBlob* errorBlob = nullptr;
     D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
-        &serializedRootSig, &errorBlob);
+        &serializedRootSig, &errorBlob);*/
 
+    ID3DBlob* rootSignature = CompileShader(L"Shaders/Rootsignature.hlsl", nullptr, "ROOTSIG", "rootsig_1_1");
+    
     device->CreateRootSignature(
         0,
-        serializedRootSig->GetBufferPointer(),
-        serializedRootSig->GetBufferSize(),
+        rootSignature->GetBufferPointer(),
+        rootSignature->GetBufferSize(),
         IID_PPV_ARGS(&mRootSignature)
     );
 

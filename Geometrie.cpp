@@ -101,7 +101,6 @@ void Geometrie::CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* comm
 	// Initialize the indices buffer view.
 	IndexFormat = DXGI_FORMAT_R16_UINT;
 	IndexBufferByteSize = ibByteSize;
-
 	IndicesCount = meshData.Indices16.size();
 
 	delete VertexBufferUploader;

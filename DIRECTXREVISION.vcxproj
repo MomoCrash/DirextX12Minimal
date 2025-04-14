@@ -158,6 +158,7 @@
     <ClCompile Include="d3dUtils.cpp" />
     <ClCompile Include="Geometrie.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="RenderObject.cpp" />
     <ClCompile Include="RenderWindow.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Transform.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="d3dx12.h" />
     <ClInclude Include="Geometrie.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="RenderObject.h" />
     <ClInclude Include="RenderWindow.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Transform.h" />

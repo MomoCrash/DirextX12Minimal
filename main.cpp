@@ -13,10 +13,10 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
     window->CloseCommandList();
 
     UploadBuffer<ObjectData>* constantBuffer = new UploadBuffer<ObjectData>(window->GetDevice(), 1, true);
-    constantBuffer->Resource()->SetName(L"PASS_BUFFER");
+    constantBuffer->Resource()->SetName(L"OBJECT_BUFFER");
 
     UploadBuffer<ObjectData>* constantBuffer2 = new UploadBuffer<ObjectData>(window->GetDevice(), 1, true);
-    constantBuffer->Resource()->SetName(L"PASS_BUFFER");
+    constantBuffer->Resource()->SetName(L"OBJECT_BUFFER");
 
     TRANSFORM transform;
     transform.Reset();

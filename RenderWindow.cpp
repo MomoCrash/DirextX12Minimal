@@ -6,10 +6,7 @@
 
 using namespace DirectX ;
 
-RenderWindow::RenderWindow(HINSTANCE hInstance) : Window(hInstance)
-{
-
-}
+RenderWindow::RenderWindow(HINSTANCE hInstance) : Window(hInstance) { }
 
 bool RenderWindow::Initialize()
 {

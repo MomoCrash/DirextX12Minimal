@@ -8,6 +8,7 @@ using namespace DirectX;
 
 struct TRANSFORM
 {
+private:
     XMFLOAT3 mvPosition;
     XMFLOAT3 mvScaling;
 
